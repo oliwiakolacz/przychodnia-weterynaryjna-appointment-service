@@ -1,6 +1,6 @@
 # Appointment Service
 
-Autorzy: Oliwia Kołacz, Marek Kubiński
+Autorzy: Oliwia Kołacz (83099), Marek Kubiński (82962)
 
 Mikroserwis rezerwacji wizyt dla systemu przychodni weterynaryjnej.
 Realizuje wymagania:
@@ -13,8 +13,8 @@ Spring Boot 3.3 (Java 21) · Spring Web · Spring Data JPA · PostgreSQL · Spri
 ## Model i kluczowe decyzje
 - Po utworzeniu/anulowaniu/przesunięciu wizyty publikowane jest zdarzenie na topic
   `appointment.events` (klucz = id wizyty), które jest konsumowane przez m.in. przez Notification Service.
-- `AppointmentSlot` (statusy: wolny, tymczasowo zablokowany, zarezerwowany).
-- Blokada wygasa po  domyślnie 5 min (`appointment.slot.hold-duration`) ; 
+- Statusy `AppointmentSlot`: wolny, tymczasowo zablokowany, zarezerwowany.
+- Blokada wygasa domyślnie po 5 min (`appointment.slot.hold-duration`).
 - `ExpiredHoldsCleaner` cyklicznie zwalnia wygasłe blokady.
 
 
@@ -27,7 +27,7 @@ Spring Boot 3.3 (Java 21) · Spring Web · Spring Data JPA · PostgreSQL · Spri
 | POST | `/api/v1/appointments/{id}/cancellation` | FR-APPT-002 — anulowanie wizyty            |
 | POST | `/api/v1/appointments/{id}/reschedule` | FR-APPT-002 — przesunięcie wizyty          |
 
-Przepływ rezerwacji: `GET sloty` → `POST hold` (5-min blokada slotu) → `POST appointments` (potwierdzenie).
+Przepływ rezerwacji: `GET slots` → `POST hold` (5-min blokada slotu) → `POST appointments` (potwierdzenie).
 
 Kody błędów: `404` nie znaleziono, `409` slot zajęty / blokada wygasła / zły stan wizyty,
 `422` niepoprawna walidacja żądania.
@@ -42,10 +42,13 @@ mvn spring-boot:run           # serwis na :8083
 ```bash
 mvn test
 ```
-- `AppointmentSlotTest`, `AppointmentTest` — logika domenowa (czysty JUnit).
+- `AppointmentSlotTest`, `AppointmentTest` — logika domenowa.
 - `AppointmentServiceTest` — orkiestracja (Mockito, `Clock.fixed`).
 - `SlotLockingConcurrencyIT` — wyścig o slot na realnym H2.
 - `AppointmentControllerIT` — REST end-to-end (MockMvc).
 
 ## Uwagi produkcyjne
 - `ddl-auto: update` jest tylko dla demo
+
+## Dokumentacja
+Znajduje sie w folderze `/documents` wraz z diagramami `/documents/diagrams` .
