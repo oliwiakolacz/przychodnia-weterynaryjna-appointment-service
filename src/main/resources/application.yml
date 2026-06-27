@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: appointment-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/appointments}
+    username: ${DB_USER:appointments}
+    password: ${DB_PASSWORD:appointments}
+  jpa:
+    hibernate:
+      ddl-auto: update          # demo only; w prod migracje (Flyway/Liquibase)
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      properties:
+        enable.idempotence: true
+        spring.json.add.type.headers: true
+
+appointment:
+  slot:
+    hold-duration: PT5M          # FR-APPT-003: 5-minutowa blokada slotu
+    cleanup-interval: PT1M       # częstotliwość zwalniania wygasłych blokad
+
+server:
+  port: 8083
